@@ -1,3 +1,10 @@
+const biomeColours = {
+    'desert': '#b9a087',
+    'taiga': '#72b38e',
+    'forest': '#33a02c',
+    'grassland': '#d9b400'
+};
+
 (async () => {
     const canvas = document.getElementById('map');
     let width = canvas.clientWidth;
@@ -7,6 +14,8 @@
     const observer = new ResizeObserver((entries) => {
         width = canvas.clientWidth;
         height = canvas.clientHeight;
+
+        draw();
     });
     observer.observe(canvas)
 
@@ -19,7 +28,7 @@
         if (y > yMax) yMax = y;
     }
 
-    const draw = (time) => {
+    const draw = () => {
         canvas.width = width;
         canvas.height = height;
 
@@ -27,13 +36,27 @@
         const yScale = height / yMax;
         const scale = Math.min(xScale, yScale);
 
-        ctx.fillStyle = "rgb(0, 0, 0)";
-        hexdata.forEach(({x, y}) => {
-            ctx.fillRect(x*scale, y*scale, scale, scale);
+        ctx.strokeStyle = "rgb(100, 100, 100)";
+        hexdata.forEach(({x, y, biome}) => {
+            ctx.fillStyle = biomeColours[biome];
+
+            ctx.beginPath();
+            ctx.moveTo(x*scale, y*scale);
+            ctx.lineTo((x + 1.82)*scale, (y - 1.05)*scale);
+            ctx.lineTo((x + 3.64)*scale, y*scale);
+            ctx.lineTo((x + 3.64)*scale, (y + 2.1)*scale);
+            ctx.lineTo((x + 1.82)*scale, (y + 3.15)*scale);
+            ctx.lineTo(x*scale, (y + 2.1)*scale);
+            ctx.lineTo(x*scale, y*scale);
+            ctx.closePath();
+            ctx.stroke();
+            ctx.fill();
         });
 
-        requestAnimationFrame(draw);
+        // requestAnimationFrame(draw);
+        // Quite laggy, might re-enable when tooltips are added?
     }
 
-    requestAnimationFrame(draw);
+    draw();
+    // requestAnimationFrame(draw);
 })()
